@@ -7,14 +7,23 @@ import { createTodo } from '../api/todos-api'
 export function NewTodoInput({ onNewTodo }) {
   const [newTodoName, setNewTodoName] = useState('')
 
-  const { getAccessTokenSilently } = useAuth0()
+  const { getAccessTokenSilently, getAccessTokenWithPopup } = useAuth0()
 
   const onTodoCreate = async (event) => {
     try {
-      const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
-        scope: 'write:todos'
-      })
+      const accessToken = await (async () => {
+        try {
+          return await getAccessTokenSilently({
+            audience: 'https://todo-app/',
+            scope: 'write:todos'
+          })
+        } catch (e) {
+          return await getAccessTokenWithPopup({
+            audience: 'https://todo-app/',
+            scope: 'write:todos'
+          })
+        }
+      })()
       const dueDate = calculateDueDate()
       const createdTodo = await createTodo(accessToken, {
         name: newTodoName,

@@ -12,8 +12,10 @@ ReactDOM.render(
     domain={domain}
     clientId={clientId}
     redirectUri={window.location.origin}
-    audience={`https://${domain}/api/v2/`}
+    audience="https://todo-app/"
     scope="read:todo write:todo delete:todo"
+    useRefreshTokens={true}
+    cacheLocation="localstorage"
   >
     <App />
   </Auth0Provider>,
