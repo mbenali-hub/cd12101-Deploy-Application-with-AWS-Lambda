@@ -1,3 +1,4 @@
+import AWSXRay from 'aws-xray-sdk-core'
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createLogger } from '../utils/logger.mjs'
@@ -6,7 +7,7 @@ const logger = createLogger('AttachmentUtils')
 
 export class AttachmentUtils {
   constructor(
-    s3Client = new S3Client(),
+    s3Client = AWSXRay.captureAWSv3Client(new S3Client()),
     bucketName = process.env.ATTACHMENT_S3_BUCKET,
     urlExpiration = parseInt(process.env.SIGNED_URL_EXPIRATION)
   ) {
