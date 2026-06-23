@@ -76,19 +76,13 @@ export function Todos() {
 
   async function onTodoDelete(todoId) {
     try {
-      const accessToken = await (async () => {
-        try {
-          return await getAccessTokenSilently({
-            audience: 'https://todo-app/',
-            scope: 'delete:todo'
-          })
-        } catch (e) {
-          return await getAccessTokenWithPopup({
-            audience: 'https://todo-app/',
-            scope: 'delete:todo'
-          })
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: 'https://todo-app/',
+          scope: 'delete:todos',
+          prompt: 'consent'
         }
-      })()
+      })
       await deleteTodo(accessToken, todoId)
       setTodos(todos.filter((todo) => todo.todoId !== todoId))
     } catch (e) {
@@ -99,19 +93,13 @@ export function Todos() {
   async function onTodoCheck(pos) {
     try {
       const todo = todos[pos]
-      const accessToken = await (async () => {
-        try {
-          return await getAccessTokenSilently({
-            audience: 'https://todo-app/',
-            scope: 'write:todo'
-          })
-        } catch (e) {
-          return await getAccessTokenWithPopup({
-            audience: 'https://todo-app/',
-            scope: 'write:todo'
-          })
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: 'https://todo-app/',
+          scope: 'write:todos',
+          prompt: 'consent'
         }
-      })()
+      })
       await patchTodo(accessToken, todo.todoId, {
         name: todo.name,
         dueDate: todo.dueDate,
@@ -132,7 +120,7 @@ export function Todos() {
     navigate(`/todos/${todoId}/edit`)
   }
 
-  const { user, getAccessTokenSilently, getAccessTokenWithPopup } = useAuth0()
+  const { user, getAccessTokenSilently } = useAuth0()
   const [todos, setTodos] = useState([])
   const [loadingTodos, setLoadingTodos] = useState(true)
   const navigate = useNavigate()
@@ -145,26 +133,19 @@ export function Todos() {
   useEffect(() => {
     async function foo() {
       try {
-        const accessToken = await (async () => {
-          try {
-            return await getAccessTokenSilently({
-              audience: 'https://todo-app/',
-              scope: 'read:todos'
-            })
-          } catch (e) {
-            return await getAccessTokenWithPopup({
-              audience: 'https://todo-app/',
-              scope: 'read:todos'
-            })
+        const accessToken = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: 'https://todo-app/',
+            scope: 'read:todos',
+            prompt: 'consent'
           }
-        })()
+        })
         console.log('Access token: ' + accessToken)
         const todos = await getTodos(accessToken)
         setTodos(todos)
         setLoadingTodos(false)
       } catch (e) {
-        console.log('Auth error:', e.message, e.error)
-        alert(`Failed to fetch todos: ${e.message}`)
+        alert(e.message)
       }
     }
     foo()
